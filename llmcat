@@ -141,7 +141,6 @@ get_relative_path() {
 }
 
 # Run fzf with configuration
-# Run fzf with configuration
 run_fzf() {
     local gitignore_pattern="$1"
     local custom_ignores="$2"
@@ -149,6 +148,15 @@ run_fzf() {
     root_dir=$(find_root)
 
     debug "Running fzf from: $root_dir"
+
+    # Preview script to handle files vs directories
+    local preview_cmd='
+        if [ -f {} ]; then
+            bat --style=numbers --color=always {} 2>/dev/null
+        elif [ -d {} ]; then
+            echo "\n  Directory: {}\n"
+            tree -C {} 2>/dev/null || ls -la {} 2>/dev/null
+        fi'
 
     # Change to root directory temporarily
     (cd "$root_dir" && {
@@ -160,19 +168,20 @@ run_fzf() {
 
         # Remove leading ./ from paths
         eval "$find_cmd" | sed 's|^\./||' | fzf \
-            --preview 'bat --style=numbers --color=always {} 2>/dev/null || tree -C {} 2>/dev/null || echo "No preview available"' \
-            --preview-window 'right:60%' \
+            --preview "$preview_cmd" \
+            --preview-window 'right:60%:border-left' \
             --bind 'ctrl-/:toggle-preview' \
             --bind 'ctrl-d:change-prompt(Select directories > )+reload(find . -type d | sed "s|^./||")' \
             --bind 'ctrl-f:change-prompt(Select files > )+reload(find . -type f | sed "s|^./||")' \
             --bind 'tab:toggle+up' \
             --height '80%' \
-            --border \
-            --prompt 'Select files/dirs > ' \
+            --border=rounded \
+            --prompt '⚡ Select files/dirs > ' \
             --multi \
-            --color 'hl:148,hl+:154,pointer:032,marker:010,fg+:255,prompt:064,header:blue'
+            --color 'fg+:252,bg+:-1,hl:148,hl+:154,pointer:032,marker:010,prompt:064,border:240,separator:240'
     })
 }
+
 
 # Process file content
 process_file() {
@@ -203,10 +212,12 @@ process_dir() {
         echo "---"
         echo
 
+        # Tree output
+        local tree_output
         if command -v tree >/dev/null 2>&1; then
-            (cd "$dir" && tree -I "$(echo "$gitignore_pattern" | tr '|' ' ')")
+            tree_output=$(cd "$dir" && tree -I "$(echo "$gitignore_pattern" | tr '|' ' ')")
         else
-            find "$dir" -type f -o -type d 2>/dev/null | \
+            tree_output=$(find "$dir" -type f -o -type d 2>/dev/null | \
             if [ -n "$gitignore_pattern" ]; then
                 grep -Ev "$gitignore_pattern"
             else
@@ -217,9 +228,11 @@ process_dir() {
             else
                 cat
             fi | \
-            sed -e "s/[^-][^\/]*\// |--/g" -e "s/|\([^ ]\)/|-\1/"
+            sed -e "s/[^-][^\/]*\// |--/g" -e "s/|\([^ ]\)/|-\1/")
         fi
+        echo "$tree_output"
 
+        # Process files only if not tree_only
         if [ "$tree_only" != "true" ]; then
             find "$dir" -type f 2>/dev/null | \
             if [ -n "$gitignore_pattern" ]; then
@@ -247,13 +260,17 @@ output_handler() {
     # Copy to clipboard
     echo -n "$content" | eval "$CLIP_CMD"
 
-    # Print if not quiet
-    [ "$QUIET" = "false" ] && echo "$content"
+    # Print if not quiet or if it's tree-only mode
+    if [ "$QUIET" = "false" ] || [ "$tree_only" = "true" ]; then
+        echo "$content"
+    fi
 
-    # Show feedback
-    local file_count
-    file_count=$(echo "$content" | grep -c "^## File:" || true)
-    echo "Copied $file_count file(s) to clipboard" >&2
+    # Show feedback only for file copies, not tree-only mode
+    if [ "$tree_only" != "true" ]; then
+        local file_count
+        file_count=$(echo "$content" | grep -c "^## File:" || true)
+        echo "Copied $file_count file(s) to clipboard" >&2
+    fi
 }
 
 # Process multiple targets
