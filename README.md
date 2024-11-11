@@ -16,13 +16,13 @@ $ llmcat
 Output format:
 
 ```md
-# File: src/main.rs
----
-[content]
+# Directory: src/state
 
-# File: lib/utils.rs
+[file tree]
+
+## File: src/state/config.ts
 ---
-[content]
+[file contents]
 ```
 
 See also: [Interactive Demo]() | [Blog](https://azerkoculu.com/posts/llmcat-copy-code-from-cli-to-llms)
