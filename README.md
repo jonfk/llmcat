@@ -44,8 +44,6 @@ Required for interactive mode:
 
 ## Usage
 
-
-
 #### Interactive
 
 When no path provided, llmcat opens fzf where you can search and select files by just pressing `tab` key.
@@ -58,6 +56,13 @@ Keybindings:
 * ctrl-f: File mode
 * enter: Confirm
 * esc: Exit
+
+**Example:**
+
+Select specific files, a folder with all files and README file:
+
+![llmcat 22](https://github.com/user-attachments/assets/7074ff19-87e6-4de7-bd78-a8f19d3af408)
+
 
 #### Command-line
 
