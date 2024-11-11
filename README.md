@@ -15,7 +15,7 @@ $ llmcat
 
 Output format:
 
-```md
+```markdown
 # Directory: src/state
 
 [file tree]
