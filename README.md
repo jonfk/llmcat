@@ -59,10 +59,9 @@ Keybindings:
 
 **Example:**
 
-Select specific files, a folder with all files and README file:
+Search and select files directories in a Phoenix project:
 
-![llmcat 22](https://github.com/user-attachments/assets/7074ff19-87e6-4de7-bd78-a8f19d3af408)
-
+![llmcat 3](https://github.com/user-attachments/assets/d53ee548-8900-4b1a-bbc7-69a0c01b72e8)
 
 #### Command-line
 
