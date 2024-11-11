@@ -4,13 +4,13 @@ Fast and flexible tool for copying files to language models from command-line, s
 
 ```bash
 # Copy specific file
-llmcat path/to/file.txt
+$ llmcat path/to/file.txt
 
 # Copy directory
-llmcat ./src/
+$ llmcat ./src/
 
 # Interactive mode (opens fuzzy finder)
-llmcat
+$ llmcat
 ```
 
 Output format:
