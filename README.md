@@ -25,6 +25,8 @@ Output format:
 [content]
 ```
 
+See also: [Interactive Demo]() | [Blog](https://azerkoculu.com/posts/llmcat-copy-code-from-cli-to-llms)
+
 ## Install
 
 ```bash
