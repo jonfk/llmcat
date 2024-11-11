@@ -1,52 +1,79 @@
 # llmcat
 
-CLI tool to quickly select & copy files/dirs for LLMs.
+Fast and flexible tool for copying files to language models from command-line, supporting fuzzy search, multi-file selection and respecting .gitignore rules.
 
-Usage: https://x.com/azerkoculu/status/1855973784009777217
+```bash
+# Copy specific file
+llmcat path/to/file.txt
 
-Manual: 
+# Copy directory
+llmcat ./src/
+
+# Interactive mode (opens fuzzy finder)
+llmcat
 ```
-llmcat - Prepare files and directories for LLM consumption
 
-Usage: llmcat [options] [path]
-       llmcat (interactive mode with fzf)
+Output format:
 
-Options:
-    -h, --help              Show this help message
-    -i, --ignore PATTERN    Additional ignore patterns (grep -E format)
-    -v, --version          Show version
-    -t, --tree-only        Only output directory tree
-    -q, --quiet            Silent mode (only copy to clipboard)
-    -p, --print            Print copied files/content (default: quiet)
-    --debug                Enable debug output
+```md
+# File: src/main.rs
+---
+[content]
 
-Interactive Mode (fzf):
-    tab          - Select/mark multiple files
-    shift-tab    - Unselect/unmark file
-    ctrl-/       - Toggle preview window
-    ctrl-d       - Select directory mode
-    ctrl-f       - Select file mode
-    enter        - Confirm selection(s)
-    esc          - Exit
+# File: lib/utils.rs
+---
+[content]
+```
 
-Examples:
-    # Interactive file selection
-    llmcat
+## Install
 
-    # Process specific file
-    llmcat path/to/file.txt
+```bash
+# Download the script
+curl -o llmcat https://raw.githubusercontent.com/azer/llmcat/main/llmcat
 
-    # Process directory with custom ignore
-    llmcat -i "*.log|*.tmp" ./src/
+# Make it executable
+chmod +x llmcat
 
-    # Print content while copying
-    llmcat -p ./src/file.txt
+# Move to your PATH
+sudo mv llmcat /usr/local/bin/
+```
 
-Features:
-    - Interactive fuzzy finder with file preview
-    - Auto-copies output to clipboard
-    - Respects .gitignore
-    - Directory tree visualization
-    - Multi-file selection
-    - Cross-platform (Linux/OSX)
+Required for interactive mode:
+* fzf
+* bat
+
+## Usage
+
+
+
+#### Interactive
+
+When no path provided, llmcat opens fzf where you can search and select files by just pressing `tab` key.
+
+Keybindings:
+* tab: Select file (moves up after selection)
+* shift-tab: Unselect file
+* ctrl-/: Toggle preview
+* ctrl-d: Directory mode
+* ctrl-f: File mode
+* enter: Confirm
+* esc: Exit
+
+#### Command-line
+
+```bash
+# Copy a single file
+$ llmcat src/main.rs
+
+# Copy directory
+$ llmcat src/
+
+# Ignore specific files
+$ llmcat -i "*.log" ./src/
+
+# Print output while copying
+$ llmcat -p file.txt
+
+# Print only the directory tree
+$ llmcat -t ./src/
 ```
