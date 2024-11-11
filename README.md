@@ -1,6 +1,6 @@
 # llmcat
 
-Fast and flexible tool for copying files to language models from command-line, supporting fuzzy search, multi-file selection and respecting .gitignore rules.
+Fast and flexible tool for copying files to large language models from command-line, supporting fuzzy search, multi-file selection and respecting `.gitignore` rules.
 
 ```bash
 # Copy specific file
