@@ -1,6 +1,6 @@
 # llmcat
 
-CLI tool to quickly select & copy files & dirs for LLMs.
+CLI tool to quickly select & copy files / dirs for LLMs.
 
 Usage: https://x.com/azerkoculu/status/1855973784009777217
 
