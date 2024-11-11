@@ -1,3 +1,5 @@
+Usage Demo: https://x.com/azerkoculu/status/1855973784009777217
+
 ```
 llmcat - Prepare files and directories for LLM consumption
 
