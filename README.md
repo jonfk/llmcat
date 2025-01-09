@@ -1,5 +1,8 @@
 # llmcat
 
+<img src="https://github.com/user-attachments/assets/4354459f-be48-41f5-b6e4-2f00fa78d40d" width="200" />
+
+
 Fast and flexible tool for copying files to large language models from command-line, supporting fuzzy search, multi-file selection and respecting `.gitignore` rules.
 
 ```bash
