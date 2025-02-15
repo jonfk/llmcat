@@ -81,7 +81,9 @@ detect_os() {
             }
             ;;
         "Linux")
-            if command -v xclip >/dev/null 2>&1; then
+            if command -v wl-copy >/dev/null 2>&1; then
+                CLIP_CMD="wl-copy"
+            elif command -v xclip >/dev/null 2>&1; then
                 CLIP_CMD="xclip -selection clipboard"
             elif command -v xsel >/dev/null 2>&1; then
                 CLIP_CMD="xsel --clipboard --input"
