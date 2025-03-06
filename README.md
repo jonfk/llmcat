@@ -45,9 +45,8 @@ sudo mv llmcat /usr/local/bin/
 
 Required dependencies:
 * fd (for file discovery)
-* ripgrep (for text operations)
 * fzf (for interactive selection)
-* bat (for file preview in interactive mode)
+* bat (for file preview in interactive mode) (optional)
 
 ## Usage
 
@@ -153,4 +152,3 @@ Features:
 - Uses `fd` instead of `find`, automatically respecting `.gitignore` files
 - Hidden files/directories are excluded by default (unlike `find`)
 - Match patterns now use fd's glob syntax instead of grep patterns
-- Uses ripgrep for faster text operations
