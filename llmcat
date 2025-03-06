@@ -170,12 +170,13 @@ run_fzf() {
         
         debug "Fd command: $fd_cmd"
 
-        # Execute fd command and pipe to fzf
-        eval "$fd_cmd" | fzf \
+        # Execute fd command and pipe to fzf, adding the current directory
+        # to maintain original behavior
+        (echo "."; eval "$fd_cmd") | fzf \
             --preview "$preview_cmd" \
             --preview-window 'right:60%:border-left' \
             --bind 'ctrl-/:toggle-preview' \
-            --bind "ctrl-d:change-prompt(Select directories > )+reload(fd . --type directory --color=never $fd_opts)" \
+            --bind "ctrl-d:change-prompt(Select directories > )+reload(echo \".\"; fd . --type directory --color=never $fd_opts)" \
             --bind "ctrl-f:change-prompt(Select files > )+reload(fd . --type file --color=never $fd_opts)" \
             --bind 'tab:toggle+up' \
             --height '80%' \
