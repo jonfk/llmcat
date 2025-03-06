@@ -6,6 +6,7 @@ CLIP_CMD=""
 VERSION="2.0.0"
 QUIET="true"
 DEBUG="false"
+FILE_COUNT=0  # Initialize the file counter
 
 # Help text
 show_help() {
@@ -200,6 +201,7 @@ process_file() {
     local file="$1"
     local rel_path
     rel_path=$(get_relative_path "$file")
+    # Note: Don't increment counter here since this runs in a subshell
     {
         echo "## File: $rel_path"
         echo "---"
@@ -263,9 +265,7 @@ output_handler() {
 
     # Show feedback only for file copies, not tree-only mode
     if [ "$tree_only" != "true" ]; then
-        local file_count
-        file_count=$(echo "$content" | rg -c "^## File:" || true)
-        echo "Copied $file_count file(s) to clipboard" >&2
+        echo "Copied $FILE_COUNT file(s) to clipboard" >&2
     fi
 }
 
@@ -276,11 +276,22 @@ process_targets() {
     local fd_opts="$1"
     shift
 
+    # Reset file counter before processing
+    FILE_COUNT=0
+    
     for target in "$@"; do
         debug "Processing: $target"
         if [ -f "$target" ]; then
+            FILE_COUNT=$((FILE_COUNT + 1))
             output+="$(process_file "$target")"
         elif [ -d "$target" ]; then
+            # For directories, we need to count the files inside
+            if [ "$tree_only" != "true" ]; then
+                # Count files in directory
+                local file_count_in_dir
+                file_count_in_dir=$(cd "$target" && fd . --type file --color=never $fd_opts | wc -l)
+                FILE_COUNT=$((FILE_COUNT + file_count_in_dir))
+            fi
             output+="$(process_dir "$target" "$fd_opts" "$tree_only")"
         else
             echo "Warning: Target not found - $target" >&2
