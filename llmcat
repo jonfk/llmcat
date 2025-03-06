@@ -61,7 +61,6 @@ Behavior Changes from v1.x:
     - Uses fd instead of find, automatically respecting .gitignore files
     - Hidden files/directories are excluded by default (unlike find)
     - Match patterns now use fd's syntax instead of grep patterns
-    - Uses ripgrep for faster text operations
 
 Author:
     Azer Koculu (https://azerkoculu.com)
@@ -129,14 +128,6 @@ check_dependencies() {
         missing=true
     fi
 
-    if ! command -v rg >/dev/null 2>&1; then
-        echo "Interactive mode requires ripgrep. Install with:"
-        echo "  brew install ripgrep    # macOS"
-        echo "  apt install ripgrep     # Ubuntu"
-        echo "  https://github.com/BurntSushi/ripgrep#installation"
-        missing=true
-    fi
-    
     if ! command -v fzf >/dev/null 2>&1; then
         echo "Interactive mode requires fzf. Install with:"
         echo "  brew install fzf    # macOS"
