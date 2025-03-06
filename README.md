@@ -3,7 +3,7 @@
 <img src="https://github.com/user-attachments/assets/4354459f-be48-41f5-b6e4-2f00fa78d40d" width="200" />
 
 
-Fast and flexible tool for copying files to large language models from command-line, supporting fuzzy search, multi-file selection and respecting `.gitignore` rules.
+Fast and flexible tool for copying files to large language models from command-line, supporting fuzzy search, multi-file selection and automatically respecting `.gitignore` rules.
 
 ```bash
 # Copy specific file
@@ -43,9 +43,11 @@ chmod +x llmcat
 sudo mv llmcat /usr/local/bin/
 ```
 
-Required for interactive mode:
-* fzf
-* bat
+Required dependencies:
+* fd (for file discovery)
+* ripgrep (for text operations)
+* fzf (for interactive selection)
+* bat (for file preview in interactive mode)
 
 ## Usage
 
@@ -77,8 +79,17 @@ $ llmcat src/main.rs
 # Copy directory
 $ llmcat src/
 
-# Ignore specific files
+# Ignore specific files (uses fd glob patterns)
 $ llmcat -i "*.log" ./src/
+
+# Ignore multiple patterns
+$ llmcat -i "*.log" -i "*.tmp" ./src/
+
+# Don't respect gitignore files
+$ llmcat -n ./src/
+
+# Include hidden files/directories
+$ llmcat -H ./src/
 
 # Print output while copying
 $ llmcat -p file.txt
@@ -97,12 +108,14 @@ Usage: llmcat [options] [path]
 
 Options:
     -h, --help              Show this help message
-    -i, --ignore PATTERN    Additional ignore patterns (grep -E format)
-    -v, --version          Show version
-    -t, --tree-only        Only output directory tree
-    -q, --quiet            Silent mode (only copy to clipboard)
-    -p, --print            Print copied files/content (default: quiet)
-    --debug                Enable debug output
+    -i, --ignore PATTERN    Additional ignore patterns (fd exclude format: glob pattern)
+    -v, --version           Show version
+    -t, --tree-only         Only output directory tree
+    -q, --quiet             Silent mode (only copy to clipboard)
+    -p, --print             Print copied files/content (default: quiet)
+    -n, --no-ignore         Don't respect gitignore/ignore files
+    -H, --hidden            Include hidden files/directories
+    --debug                 Enable debug output
 
 Interactive Mode (fzf):
     tab          - Select/mark multiple files
@@ -121,7 +134,7 @@ Examples:
     llmcat path/to/file.txt
 
     # Process directory with custom ignore
-    llmcat -i "*.log|*.tmp" ./src/
+    llmcat -i "*.log" -i "*.tmp" ./src/
 
     # Print content while copying
     llmcat -p ./src/file.txt
@@ -129,8 +142,15 @@ Examples:
 Features:
     - Interactive fuzzy finder with file preview
     - Auto-copies output to clipboard
-    - Respects .gitignore
+    - Automatically respects .gitignore, .ignore, and .fdignore files
     - Directory tree visualization
     - Multi-file selection
     - Cross-platform (Linux/OSX)
 ```
+
+## Behavior Changes from v1.x
+
+- Uses `fd` instead of `find`, automatically respecting `.gitignore` files
+- Hidden files/directories are excluded by default (unlike `find`)
+- Match patterns now use fd's glob syntax instead of grep patterns
+- Uses ripgrep for faster text operations

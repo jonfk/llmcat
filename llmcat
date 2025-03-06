@@ -18,7 +18,7 @@ Usage: llmcat [options] [path]
 
 Options:
     -h, --help              Show this help message
-    -i, --ignore PATTERN    Additional ignore patterns (fd exclude format)
+    -i, --ignore PATTERN    Additional ignore patterns (fd exclude format: glob pattern)
     -v, --version           Show version
     -t, --tree-only         Only output directory tree
     -q, --quiet             Silent mode (only copy to clipboard)
