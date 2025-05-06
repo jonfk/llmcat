@@ -6,6 +6,7 @@ CLIP_CMD=""
 VERSION="2.0.0"
 QUIET="true"
 DEBUG="false"
+TREE_ONLY="false"
 FILE_COUNT=0  # Initialize the file counter
 
 # Help text
@@ -20,7 +21,7 @@ Options:
     -h, --help              Show this help message
     -i, --ignore PATTERN    Additional ignore patterns (fd exclude format: glob pattern)
     -v, --version           Show version
-    -t, --tree-only         Only output directory tree
+    -t, --tree-only         Only output directory tree (uses current directory if no directory is specified)
     -q, --quiet             Silent mode (only copy to clipboard)
     -p, --print             Print copied files/content (default: quiet)
     -n, --no-ignore         Don't respect gitignore/ignore files
@@ -48,6 +49,12 @@ Examples:
 
     # Print content while copying
     llmcat -p ./src/file.txt
+
+    # Print only directory tree of current directory
+    llmcat -t
+
+    # Print only directory tree of specified directory
+    llmcat -t path/to/directory
 
 Features:
     - Interactive fuzzy finder with file preview
@@ -205,7 +212,6 @@ process_file() {
 process_dir() {
     local dir="$1"
     local fd_opts="$2"
-    local tree_only="$3"
     local rel_path
     rel_path=$(get_relative_path "$dir")
 
@@ -229,7 +235,7 @@ process_dir() {
         echo "$tree_output"
 
         # Process files only if not tree_only
-        if [ "$tree_only" != "true" ]; then
+        if [ "$TREE_ONLY" != "true" ]; then
             # Find all files with fd
             local fd_files_cmd="cd \"$dir\" && fd . --type file --color=never $fd_opts"
             
@@ -250,23 +256,24 @@ output_handler() {
     echo -n "$content" | eval "$CLIP_CMD"
 
     # Print if not quiet or if it's tree-only mode
-    if [ "$QUIET" = "false" ] || [ "$tree_only" = "true" ]; then
+    if [ "$QUIET" = "false" ] || [ "$TREE_ONLY" = "true" ]; then
         echo "$content"
     fi
 
     # Show feedback only for file copies, not tree-only mode
-    if [ "$tree_only" != "true" ]; then
+    if [ "$TREE_ONLY" != "true" ]; then
         echo "Copied $FILE_COUNT file(s) to clipboard" >&2
     fi
 }
 
 # Process multiple targets
 process_targets() {
-    local output=""
-    local target
     local fd_opts="$1"
     shift
 
+    local output=""
+    local target
+    
     # Reset file counter before processing
     FILE_COUNT=0
     
@@ -277,13 +284,13 @@ process_targets() {
             output+="$(process_file "$target")"
         elif [ -d "$target" ]; then
             # For directories, we need to count the files inside
-            if [ "$tree_only" != "true" ]; then
+            if [ "$TREE_ONLY" != "true" ]; then
                 # Count files in directory
                 local file_count_in_dir
                 file_count_in_dir=$(cd "$target" && fd . --type file --color=never $fd_opts | wc -l)
                 FILE_COUNT=$((FILE_COUNT + file_count_in_dir))
             fi
-            output+="$(process_dir "$target" "$fd_opts" "$tree_only")"
+            output+="$(process_dir "$target" "$fd_opts")"
         else
             echo "Warning: Target not found - $target" >&2
             continue
@@ -296,7 +303,6 @@ process_targets() {
 
 main() {
     local fd_opts=""
-    local tree_only="false"
     local targets=()
 
     # Parse arguments
@@ -314,7 +320,8 @@ main() {
                 fd_opts+=" --hidden"; 
                 shift ;;
             -t|--tree-only) 
-                tree_only="true"; 
+                TREE_ONLY="true"; 
+                QUIET="false";  # Always print when in tree-only mode
                 shift ;;
             -q|--quiet) 
                 QUIET="true"; 
@@ -332,6 +339,12 @@ main() {
     done
 
     detect_os
+
+    # If tree-only mode is enabled and no targets, use current directory
+    if [ "$TREE_ONLY" = "true" ] && [ ${#targets[@]} -eq 0 ]; then
+        debug "Tree-only mode with no targets, using current directory"
+        targets+=(".")
+    fi
 
     # Interactive mode if no targets
     if [ ${#targets[@]} -eq 0 ]; then
